@@ -10,7 +10,7 @@
   "files": [
     "dist"
   ],
-  "author": "Steve Sewell <steve@builder.io>",
+  "author": "Carmel Cohen <carmelc@wix.com>",
   "repository": {
     "type": "git",
     "url": ""
@@ -127,8 +127,8 @@
     "@emotion/styled": "^10.0.23",
     "@material-ui/core": "^3.9.2",
     "@material-ui/icons": "^1.1.1",
-    "@wix/data-backend-public-sdk-poc": "^1.0.3",
-    "@wix/ecom": "^1.0.49",
+    "@wix/data-backend-public-sdk-poc": "^1.0.7",
+    "@wix/ecom": "^1.0.51",
     "@wix/sdk": "^1.1.7",
     "js-cookie": "^3.0.1",
     "react": "^16.11.0",

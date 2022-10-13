@@ -2,6 +2,7 @@ import fetcher from './fetcher';
 
 export interface ProductOperations {
     getAllProducts: (input?: GetAllProductsOpInput) => Promise<{products: any[]}>
+    getAllCollections: (input?: GetAllProductsOpInput) => Promise<{collections: any[]}>
 }
 
 export type GetAllProductsOpInput = {
@@ -19,5 +20,13 @@ export function productsOperations(wixDomain: string): ProductOperations {
      }: GetAllProductsOpInput = {}) {
         return fetcher({url, wixDomain, ...(variables && {variables: JSON.stringify({query: {paging: {limit: variables.first}}})})})
     }
-    return {getAllProducts};
+
+    async function getAllCollections({
+                                      url = 'stores/v1/collections/query',
+                                      variables,
+                                      preview
+                                  }: GetAllProductsOpInput = {}) {
+        return fetcher({url, wixDomain, ...(variables && {variables: JSON.stringify({query: {paging: {limit: variables.first}}})})})
+    }
+    return {getAllProducts, getAllCollections};
 }

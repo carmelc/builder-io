@@ -1,9 +1,9 @@
-# Builder.io Swell plugin
+# Builder.io Wix Stores plugin
 
 Easily connect your Swell data to your Builder.io content!
 ## Installation
 
-Go to [builder.io/account/organization](https://builder.io/account/organization) and press on `@builder.io/plugin-swell` in the list of plugins, then hit save, you'll be prompted for storeId and secretKey next.
+Go to [builder.io/account/organization](https://builder.io/account/organization) and press on `@builder.io/plugin-wix-stores` in the list of plugins, then hit save, you'll be prompted for store URL and secretKey.
 
 ![Installation screenshot](https://cdn.builder.io/api/v1/image/assets%2F6d39f4449e2b4e6792a793bb8c1d9615%2F18a7201313914cccae7f0311a1a614ae)
 

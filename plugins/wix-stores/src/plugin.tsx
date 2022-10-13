@@ -1,73 +1,63 @@
 import React from "react";
 import { registerCommercePlugin } from '@builder.io/commerce-plugin-tools';
-import { createClient, session } from '@wix/sdk';
-import { WIX_ACCESS_TOKEN_COOKIE, WIX_DOMAIN, WIX_REFRESH_TOKEN_COOKIE, WIX_COOKIE_EXPIRE } from './consts';
 // @ts-ignore
 import Cookies from 'js-cookie';
-// @ts-ignore
-import { data } from '@wix/data-backend-public-sdk-poc';
+import {ProductOperations, productsOperations} from './domain/api';
 
-const wixClient = createClient({ data });
-export type clientTypes = typeof wixClient;
+const productToResource = (product: any) => ({
+  id: product.id,
+  title: product.name,
+  handle: product.slug,
+});
 
-const fetcher = async (wixDomain: string): Promise<typeof wixClient> => {
-  let accessToken = Cookies.get(WIX_ACCESS_TOKEN_COOKIE) ?? ''
-  let refreshToken = Cookies.get(WIX_REFRESH_TOKEN_COOKIE) ?? ''
-  const wixSession = await session({ refreshToken, accessToken }, { domain: wixDomain!} );
-  Cookies.set(WIX_ACCESS_TOKEN_COOKIE, wixSession.accessToken!, { expires: 0.3 })
-  Cookies.set(WIX_REFRESH_TOKEN_COOKIE, wixSession.refreshToken!, { expires: WIX_COOKIE_EXPIRE })
-  wixClient.setSession(wixSession)
+const collectionToResource = (collection: any) => ({
+  id: collection.id,
+  title: collection.name,
+  handle: collection.id,
+});
 
-  return wixClient
-}
 
 class WixStoreService {
-  private readonly fetcherPromise: Promise<clientTypes>;
+  private client: ProductOperations;
 
   constructor(domain: string) {
-    this.fetcherPromise = fetcher(domain);
+    this.client = productsOperations(domain);
   }
 
   async findProductById(productId: string) {
-    const fetcher = await this.fetcherPromise;
-    const dataResult = fetcher.data.query({
-      collectionName: 'Stores/Products'
-    });
-    console.log(dataResult);
-    return {
-      id: 'test-id',
-      title: 'Test 1'
-    };
+    const product = (await this.client.getAllProducts()).products.find(({id}) => productId === id);
+    return productToResource(product!);
   }
 
 
-  async findProductByCollection(collectionId: string) {
-    const fetcher = await this.fetcherPromise;
-    const dataResult =  fetcher.data.query({
-      collectionName: 'Stores/Products'
-    });
-    console.log(dataResult);
-    return {
-      id: 'test-id',
-      title: 'Test 1 - find collection'
-    }
+  async findProductBySlug(slugToFind: string) {
+    const product = (await this.client.getAllProducts()).products.find(({slug}) => slugToFind === slug);
+    return productToResource(product!);
   }
 
   async searchProducts(searchText: string) {
-    const fetcher = await this.fetcherPromise;
-    const dataResult =  fetcher.data.query({
-      collectionName: 'Stores/Products'
-    });
-    console.log(dataResult);
-    return [{
-      id: 'test-id',
-      title: 'Test 1 - search'
-    }, {
-      id: 'test-id-2',
-      title: 'Test 2 - search'
-    }]
+    const searchTextLowered = searchText.toLowerCase();
+    return (await this.client.getAllProducts()).products
+        .map(productToResource)
+        .filter(({title}) => title.toLowerCase().indexOf(searchTextLowered) > -1);
   }
 
+  async findCollectionById(collectionId: string) {
+    const collection = (await this.client.getAllCollections()).collections.find(({id}) => collectionId === id);
+    return collectionToResource(collection!);
+  }
+
+  async findCollectionBySlug(slugToFind: string) {
+    const collection = (await this.client.getAllCollections()).collections.find(({id}) => slugToFind === id);
+    return collectionToResource(collection!);
+  }
+
+  async searchCollections(searchText: string) {
+    const searchTextLowered = searchText?.toLowerCase();
+    return (await this.client.getAllCollections()).collections
+        .map(collectionToResource)
+        .filter(({title}) => !searchTextLowered || title.toLowerCase().indexOf(searchTextLowered) > -1);
+  }
 }
 
 registerCommercePlugin(
@@ -91,7 +81,7 @@ registerCommercePlugin(
           'Get Wix Public Key when Kfir will create it',
       },
     ],
-    ctaText: `Connect your swell.is store`,
+    ctaText: `Connect your Wix Store`,
   },
   async settings => {
     const storeDomain = settings.get('storeDomain')?.trim();
@@ -104,46 +94,29 @@ registerCommercePlugin(
           return service.findProductById(id);
         },
         async findByHandle(handle: string) {
-          return service.findProductByCollection(handle);
+          return service.findProductBySlug(handle);
         },
         async search(search: string) {
           return service.searchProducts(search);
         },
 
-        getRequestObject(id: string) {
-          return {
-            '@type': '@builder.io/core:Request' as const,
-            request: {
-              url: `https://${publicKey}@${storeDomain}.swell.store/api/products/${id}`,
-            },
-            options: {
-              product: id,
-            },
-          };
+        getRequestObject(id: string, resource: any) {
+          return resource as any;
         },
       },
-      category: {
+      collection: {
         async findById(id: string) {
-          return service.findProductById(id);
+          return service.findCollectionById(id);
         },
         async findByHandle(handle: string) {
-          return service.findProductByCollection(handle);
+          return service.findCollectionBySlug(handle);
         },
         async search(search: string) {
-          return service.searchProducts(search);
+          return service.searchCollections(search);
         },
 
-        getRequestObject(id: string) {
-          return {
-            '@type': '@builder.io/core:Request' as const,
-            request: {
-              // https://{public_key}@{client_id}.swell.store/api/categories/5e31e67be53f9a59d89600f1.
-              url: `https://${publicKey}@${storeDomain}.swell.store/api/categories/${id}`,
-            },
-            options: {
-              category: id,
-            },
-          };
+        getRequestObject(id: string, resource: any) {
+          return resource as any;
         },
       },
     };
