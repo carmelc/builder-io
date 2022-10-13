@@ -117,7 +117,7 @@
     "tslint-config-prettier": "^1.15.0",
     "tslint-config-standard": "^8.0.1",
     "typedoc": "^0.12.0",
-    "typescript": "^3.0.3"
+    "typescript": "^4.8.4"
   },
   "dependencies": {
     "@builder.io/app-context": "^1.0.0",
@@ -127,7 +127,7 @@
     "@emotion/styled": "^10.0.23",
     "@material-ui/core": "^3.9.2",
     "@material-ui/icons": "^1.1.1",
-    "@wix/data-backend-public-sdk-poc": "^1.0.7",
+    "@wix/data-backend-public-sdk-poc": "^1.0.8",
     "@wix/ecom": "^1.0.51",
     "@wix/sdk": "^1.1.7",
     "js-cookie": "^3.0.1",
