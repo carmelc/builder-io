@@ -100,8 +100,16 @@ registerCommercePlugin(
           return service.searchProducts(search);
         },
 
-        getRequestObject(id: string, resource: any) {
-          return resource as any;
+        getRequestObject(id: string) {
+          return {
+            '@type': '@builder.io/core:Request' as const,
+            request: {
+              url: `not in use`,
+            },
+            options: {
+              product: id,
+            },
+          };
         },
       },
       collection: {
@@ -115,8 +123,16 @@ registerCommercePlugin(
           return service.searchCollections(search);
         },
 
-        getRequestObject(id: string, resource: any) {
-          return resource as any;
+        getRequestObject(id: string) {
+          return {
+            '@type': '@builder.io/core:Request' as const,
+            request: {
+              url: `not in use`,
+            },
+            options: {
+              collection: id,
+            },
+          };
         },
       },
     };
