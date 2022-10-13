@@ -104,6 +104,7 @@ registerCommercePlugin(
           return {
             '@type': '@builder.io/core:Request' as const,
             request: {
+              // Symbols and User targeting is not supported :(
               url: `not in use`,
             },
             options: {
@@ -127,6 +128,7 @@ registerCommercePlugin(
           return {
             '@type': '@builder.io/core:Request' as const,
             request: {
+              // Symbols and User targeting is not supported :(
               url: `not in use`,
             },
             options: {
