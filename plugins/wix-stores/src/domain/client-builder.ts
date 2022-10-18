@@ -3,11 +3,11 @@ import {WIX_ACCESS_TOKEN_COOKIE, WIX_REFRESH_TOKEN_COOKIE, WIX_COOKIE_EXPIRE} fr
 import Cookies from 'js-cookie';
 import {createClient, session} from "@wix/sdk";
 // @ts-ignore
-// import { data } from '@wix/data-backend-public-sdk-poc'
+import { data } from '@wix/data-backend-public-sdk-poc'
 
 const wixClient = createClient({
-    data: {},
-    // data,
+    // data: {},
+    data,
 })
 
 export type clientTypes = typeof wixClient

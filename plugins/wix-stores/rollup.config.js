@@ -1,10 +1,10 @@
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import {nodeResolve} from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import sourceMaps from 'rollup-plugin-sourcemaps';
-import camelCase from 'lodash.camelcase';
 import typescript from 'rollup-plugin-typescript2';
-import json from 'rollup-plugin-json';
-import replace from 'rollup-plugin-replace';
+import camelCase from 'lodash.camelcase';
+import json from '@rollup/plugin-json';
+import replace from '@rollup/plugin-replace';
 import serve from 'rollup-plugin-serve';
 import nodePolyfills from 'rollup-plugin-node-polyfills';
 
@@ -45,21 +45,21 @@ export default {
     include: 'src/**',
   },
   plugins: [
+    nodeResolve(),
+    typescript({ useTsconfigDeclarationDir: true }),
     // Allow json resolution
     json(),
     // Compile TypeScript files
-    typescript({ useTsconfigDeclarationDir: true }),
-    // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
-    commonjs({
-      extensions: ['.js', '.ts', '.tsx'],
-    }),
     // Allow node_modules resolution, so you can use 'external' to control
     // which external modules to include in the bundle
     // https://github.com/rollup/rollup-plugin-node-resolve#usage
-    resolve(),
 
     replace({
       'process.env.NODE_ENV': JSON.stringify('production'),
+    }),
+    // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
+    commonjs({
+      extensions: ['.js', '.ts', '.tsx'],
     }),
 
     // Resolve source maps to the original source
@@ -69,8 +69,10 @@ export default {
       ? [
           serve({
             contentBase: 'dist',
+            // @ts-ignore
             port: 1268,
             headers: {
+              // @ts-ignore
               'Access-Control-Allow-Origin': '*',
               // https://developer.chrome.com/blog/private-network-access-preflight/#new-in-pna
               'Access-Control-Allow-Private-Network': 'true',
