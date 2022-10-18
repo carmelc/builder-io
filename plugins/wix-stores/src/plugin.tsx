@@ -1,19 +1,26 @@
 import React from "react";
 import { registerCommercePlugin } from '@builder.io/commerce-plugin-tools';
-// @ts-ignore
-import Cookies from 'js-cookie';
-import {ProductOperations, productsOperations} from './domain/api';
+import {
+  ProductOperations,
+  productsOperations,
+  wixMediaToImage,
+  WixStoresCollection,
+  WixStoresProduct
+} from './domain/api';
 
-const productToResource = (product: any) => ({
-  id: product.id,
+const productToResource = (product: WixStoresProduct) => ({
+  id: product._id,
   title: product.name,
   handle: product.slug,
+  image: wixMediaToImage(product.mainMedia),
+
 });
 
-const collectionToResource = (collection: any) => ({
-  id: collection.id,
+const collectionToResource = (collection: WixStoresCollection) => ({
+  id: collection._id,
   title: collection.name,
-  handle: collection.id,
+  handle: collection._id,
+  image: wixMediaToImage(collection.mainMedia),
 });
 
 
@@ -25,38 +32,45 @@ class WixStoreService {
   }
 
   async findProductById(productId: string) {
-    const product = (await this.client.getAllProducts()).products.find(({id}) => productId === id);
+    const product = (await this.client.queryProducts({id: productId}))?.products?.[0];
+    if (!product) {
+      throw new Error('No product was found for id: ' + productId);
+    }
     return productToResource(product!);
   }
 
 
   async findProductBySlug(slugToFind: string) {
-    const product = (await this.client.getAllProducts()).products.find(({slug}) => slugToFind === slug);
+    const product = (await this.client.queryProducts({ slug: slugToFind }))?.products?.[0];
+    if (!product) {
+      throw new Error('No product was found for slug: ' + slugToFind);
+    }
     return productToResource(product!);
   }
 
-  async searchProducts(searchText: string) {
-    const searchTextLowered = searchText.toLowerCase();
-    return (await this.client.getAllProducts()).products
-        .map(productToResource)
-        .filter(({title}) => title.toLowerCase().indexOf(searchTextLowered) > -1);
+  async searchProducts(searchString: string) {
+    return (await this.client.queryProducts({ searchString })).products
+        .map(productToResource);
   }
 
   async findCollectionById(collectionId: string) {
-    const collection = (await this.client.getAllCollections()).collections.find(({id}) => collectionId === id);
+    const collection = (await this.client.queryCollections({id: collectionId}))?.collections?.[0];
+    if (!collection) {
+      throw new Error('No collection was found for id: ' + collectionId);
+    }
     return collectionToResource(collection!);
   }
 
   async findCollectionBySlug(slugToFind: string) {
-    const collection = (await this.client.getAllCollections()).collections.find(({id}) => slugToFind === id);
+    const collection = (await this.client.queryCollections({slug: slugToFind}))?.collections?.[0];
+    if (!collection) {
+      throw new Error('No collection was found for slug: ' + slugToFind);
+    }
     return collectionToResource(collection!);
   }
 
-  async searchCollections(searchText: string) {
-    const searchTextLowered = searchText?.toLowerCase();
-    return (await this.client.getAllCollections()).collections
-        .map(collectionToResource)
-        .filter(({title}) => !searchTextLowered || title.toLowerCase().indexOf(searchTextLowered) > -1);
+  async searchCollections(searchString: string) {
+    return (await this.client.queryCollections({searchString})).collections?.map(collectionToResource);
   }
 }
 

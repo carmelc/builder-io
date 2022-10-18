@@ -6,7 +6,6 @@ import {createClient, session} from "@wix/sdk";
 import { data } from '@wix/data-backend-public-sdk-poc'
 
 const wixClient = createClient({
-    // data: {},
     data,
 })
 
