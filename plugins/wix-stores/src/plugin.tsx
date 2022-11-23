@@ -3,17 +3,26 @@ import { registerCommercePlugin } from '@builder.io/commerce-plugin-tools';
 // @ts-ignore
 import Cookies from 'js-cookie';
 import {ProductOperations, productsOperations} from './domain/api';
+import type {Resource} from "@builder.io/commerce-plugin-tools/dist/types/interfaces/resource";
 
-const productToResource = (product: any) => ({
+const getResourceImage = (entity: any): Resource['image'] => entity.media?.mainMedia?.image ? {
+    width: entity.media?.mainMedia?.image.width,
+    height: entity.media?.mainMedia?.image.height,
+    src: entity.media?.mainMedia?.image.url,
+  } : undefined;
+
+const productToResource = (product: any): Resource => ({
   id: product.id,
   title: product.name,
   handle: product.slug,
+  image: getResourceImage(product),
 });
 
-const collectionToResource = (collection: any) => ({
+const collectionToResource = (collection: any): Resource => ({
   id: collection.id,
   title: collection.name,
   handle: collection.id,
+  image: getResourceImage(collection),
 });
 
 
@@ -49,6 +58,7 @@ class WixStoreService {
 
   async findCollectionBySlug(slugToFind: string) {
     const collection = (await this.client.getAllCollections()).collections.find(({id}) => slugToFind === id);
+    console.log('*** collection ', collection);
     return collectionToResource(collection!);
   }
 
